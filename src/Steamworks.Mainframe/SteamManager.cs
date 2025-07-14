@@ -11,27 +11,22 @@ namespace Steamworks.Mainframe;
 /// Ensures that the Steamworks API is properly initialized, allows running Steam-specific callbacks, and handles cleanup of Steam resources upon disposal.
 /// This class enforces a singleton pattern to prevent multiple instances of the Steam API being initialized simultaneously.
 /// </summary>
-public sealed class SteamManager : IDisposable
+public static class SteamManager
 {
 #if !DISABLESTEAMWORKS
-    private static SteamManager? _instance;
-    public static SteamManager Instance => _instance ??= new SteamManager(0);
-
-    private readonly bool _initialized;
-    internal static bool Initialized => _instance is not null && Instance._initialized;
-
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private readonly SteamAPIWarningMessageHook_t m_SteamAPIWarningMessageHook;
-
-    public SteamManager(uint appId, bool drmCheck = true)
+    private static SteamAPIWarningMessageHook_t? m_SteamAPIWarningMessageHook { get;set; }
+    internal static bool Initialized { get; private set; }
+    public static void Initialize(uint appId, bool drmCheck = true)
     {
         // Only one instance of SteamManager at a time!
-        if (_instance is not null)
+        if (Initialized)
             throw new Exception("[Steamworks.NET] Tried to Initialize the SteamAPI twice in one session!");
 
-        _instance = this;
+        // CreateSteamAppIdTxt(appId);
+        Steam.AppId = appId;
         
-        if(!Environment.Is64BitProcess)
+        if (!Environment.Is64BitProcess)
             throw new Exception("[Steamworks.NET] Must be 64 bit");
 
         if (!Packsize.Test())
@@ -70,8 +65,8 @@ public sealed class SteamManager : IDisposable
         // [*] Your App ID is not completely set up, i.e. in Release State: Unavailable, or it's missing default packages.
         // Valve's documentation for this is located here:
         // https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
-        _initialized = SteamAPI.Init();
-        if (!_initialized)
+        Initialized = SteamAPI.Init();
+        if (!Initialized)
             throw new Exception("[Steamworks.NET] SteamAPI_Init() failed. Refer to Valve's documentation or the comment above this line for more information.");
         
         // Set up our callback to receive warning messages from Steam.
@@ -79,17 +74,29 @@ public sealed class SteamManager : IDisposable
         m_SteamAPIWarningMessageHook = SteamAPIDebugTextHook;
         SteamClient.SetWarningMessageHook(m_SteamAPIWarningMessageHook);
     }
-    
-    public void Dispose()
-    {
-        _instance = null;
 
-        if (!_initialized)
+    public static void Shutdown()
+    {
+        if (!Initialized)
             return;
         
         SteamAPI.Shutdown();
     }
 
+    /// <summary>
+    /// Processes pending Steam API callbacks.
+    /// Ensures that Steamworks-related events and responses are handled correctly within the application.
+    /// This method should be called frequently to maintain proper communication with the Steamworks API.
+    /// </summary>
+    public static void RunCallbacks()
+    {
+        if (!Initialized)
+            return;
+
+        // Run Steam client callbacks
+        SteamAPI.RunCallbacks();
+    }
+    
     /// <summary>
     /// Handles debug messages from the Steam API when the application is launched with the "-debug_steamapi" argument.
     /// Logs the debug text received from the Steam API as warnings.
@@ -100,23 +107,8 @@ public sealed class SteamManager : IDisposable
     {
         SteamLogger.Warning(pchDebugText.ToString());
     }
-
-    /// <summary>
-    /// Processes pending Steam API callbacks.
-    /// Ensures that Steamworks-related events and responses are handled correctly within the application.
-    /// This method should be called frequently to maintain proper communication with the Steamworks API.
-    /// </summary>
-    public void RunCallbacks()
-    {
-        if (!_initialized)
-            return;
-
-        // Run Steam client callbacks
-        SteamAPI.RunCallbacks();
-    }
     
 #else
     public static bool Initialized => false;
-    public void Dispose() { }
 #endif // !DISABLESTEAMWORKS
 }

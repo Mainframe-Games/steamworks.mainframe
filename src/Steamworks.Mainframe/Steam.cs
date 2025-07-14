@@ -9,11 +9,11 @@ public static class Steam
 	/// Returns if SteamManager is initialised
 	/// </summary>
 	public static bool Valid => SteamManager.Initialized;
-		
+
 	/// <summary>
 	/// App Id of this game. Can set from your game logic
 	/// </summary>
-	public static ulong AppId { get; set; }
+	public static ulong AppId { get; internal set; }
 		
 	/// <summary>
 	/// Id of the owner
@@ -62,7 +62,8 @@ public static class Steam
 		{
 			var friendId = SteamFriends.GetFriendByIndex(i, FLAGS);
 			var username = SteamFriends.GetFriendPersonaName(friendId);
-			var player = new SteamFriend(friendId.m_SteamID, username);
+			var state = SteamFriends.GetPersonaState();
+			var player = new SteamFriend(friendId.m_SteamID, username, state);
 			yield return player;
 		}
 	}

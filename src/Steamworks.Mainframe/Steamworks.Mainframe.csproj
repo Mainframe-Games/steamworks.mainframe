@@ -6,10 +6,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <PlatformTarget>AnyCPU</PlatformTarget>
-    </PropertyGroup>
-
     <ItemGroup>
         <Reference Include="Steamworks.NET">
             <HintPath>Steamworks.NET-Standalone_2025.161.0/Windows-x64/Steamworks.NET.dll</HintPath>
