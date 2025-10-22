@@ -1,11 +1,9 @@
-﻿using System.Text;
-
-namespace Steamworks.Mainframe;
+﻿namespace Steamworks.Mainframe;
 
 /// <summary>
 /// Represents a friend on the Steam platform, including their Steam ID and username.
 /// </summary>
-public readonly struct SteamFriend(ulong steamId, string username, EPersonaState state = default) : IEquatable<SteamFriend>, IComparable<SteamFriend>
+public readonly struct SteamFriend(ulong steamId, string username, EPersonaState state = EPersonaState.k_EPersonaStateOffline) : IEquatable<SteamFriend>, IComparable<SteamFriend>
 {
 	public readonly ulong SteamId = steamId;
 	public readonly string Username = username;
@@ -15,10 +13,7 @@ public readonly struct SteamFriend(ulong steamId, string username, EPersonaState
 
 	public override string ToString()
 	{
-		var str = new StringBuilder();
-		str.AppendLine($"Username: {Username}, SteamId: {SteamId}");
-		str.AppendLine($"\tState: {State}");
-		return str.ToString();
+		return $"{Username} ({SteamId}) - {State}";
 	}
 
 	public bool Equals(SteamFriend other)
