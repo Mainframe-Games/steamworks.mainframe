@@ -11,10 +11,9 @@ namespace Steamworks.Mainframe;
 /// Ensures that the Steamworks API is properly initialized, allows running Steam-specific callbacks, and handles cleanup of Steam resources upon disposal.
 /// This class enforces a singleton pattern to prevent multiple instances of the Steam API being initialized simultaneously.
 /// </summary>
-public static class SteamManager
+public static class SteamApi
 {
 #if !DISABLESTEAMWORKS
-    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private static SteamAPIWarningMessageHook_t? m_SteamAPIWarningMessageHook { get;set; }
     internal static bool Initialized { get; private set; }
     public static void Initialize(uint appId, bool drmCheck = true)
@@ -110,5 +109,8 @@ public static class SteamManager
     
 #else
     public static bool Initialized => false;
+    public static void Initialize(uint appId, bool drmCheck = true) { }
+    public static void RunCallbacks() { }
+    public static void Shutdown() { }
 #endif // !DISABLESTEAMWORKS
 }

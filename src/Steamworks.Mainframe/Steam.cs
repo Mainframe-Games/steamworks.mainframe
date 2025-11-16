@@ -8,7 +8,7 @@ public static class Steam
 	/// <summary>
 	/// Returns if SteamManager is initialised
 	/// </summary>
-	public static bool Valid => SteamManager.Initialized;
+	public static bool Valid => SteamApi.Initialized;
 
 	/// <summary>
 	/// App Id of this game. Can set from your game logic
@@ -53,14 +53,13 @@ public static class Steam
 		return null;
 	}
 		
-	public static IEnumerable<SteamFriend> GetFriends()
+	public static IEnumerable<SteamFriend> GetFriends(EFriendFlags flags = EFriendFlags.k_EFriendFlagAll)
 	{
-		const EFriendFlags FLAGS = EFriendFlags.k_EFriendFlagAll;
-		var count = SteamFriends.GetFriendCount(FLAGS);
+		var count = SteamFriends.GetFriendCount(flags);
 			
 		for (int i = 0; i < count; i++)
 		{
-			var friendId = SteamFriends.GetFriendByIndex(i, FLAGS);
+			var friendId = SteamFriends.GetFriendByIndex(i, flags);
 			var username = SteamFriends.GetFriendPersonaName(friendId);
 			var state = SteamFriends.GetPersonaState();
 			var player = new SteamFriend(friendId.m_SteamID, username, state);

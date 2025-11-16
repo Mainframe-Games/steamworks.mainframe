@@ -1,6 +1,6 @@
 ﻿using Steamworks.Mainframe;
 
-SteamManager.Initialize(460, false);
+SteamApi.Initialize(460, false);
 
 bool exit = false;
 Console.CancelKeyPress += (sender, e) =>
@@ -19,8 +19,8 @@ foreach (var friend in friends)
 
 while (!exit)
 {
-    SteamManager.RunCallbacks();
+    SteamApi.RunCallbacks();
     await Task.Delay(16); // 16ms (60fps)
 }
-SteamManager.Shutdown();
+SteamApi.Shutdown();
 Console.WriteLine("Testing Complete");

@@ -15,4 +15,10 @@
       <ProjectReference Include="..\Steamworks.Mainframe\Steamworks.Mainframe.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Steamworks.NET">
+        <HintPath>..\Steamworks.Mainframe\Steamworks.NET-Standalone_2025.162.1\OSX-Linux-x64\Steamworks.NET.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
